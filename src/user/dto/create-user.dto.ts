@@ -1,1 +1,15 @@
-export class CreateUserDto {}
+import { InputType, Field } from '@nestjs/graphql';
+
+@InputType()
+export class CreateUserInput {
+  @Field()
+  name: string;
+
+  @Field()
+  email: string;
+
+  @Field()
+  password: string;
+
+  // Additional fields can be added here in the future without modifying the service method signature.
+}
