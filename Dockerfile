@@ -10,14 +10,13 @@ COPY package*.json ./
 # Step 4: Install dependencies
 RUN npm install
 
+RUN npm install -g nodemon
+
 # Step 5: Copy the rest of your NestJS app
 COPY . .
-
-# Step 6: Build the app
-RUN npm run build
 
 # Step 7: Expose the port that your app runs on
 EXPOSE 3999
 
 # Step 8: Start the NestJS app
-CMD ["npm", "run", "start:prod"]
+CMD ["nodemon", "--watch", "src", "--exec", "npm run start:dev"]

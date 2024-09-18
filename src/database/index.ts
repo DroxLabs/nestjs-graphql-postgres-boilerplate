@@ -15,14 +15,6 @@ if (!password) {
   process.exit(1);
 }
 
-console.log({
-  host,
-  port,
-  username,
-  password, // Make sure this logs a proper string
-  database,
-});
-
 export const Database = new DataSource({
   type: 'postgres',
   host,

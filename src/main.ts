@@ -1,6 +1,6 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 // import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
-import { AppModule } from './app.module';
+import { AppModule } from './modules/app/app.module';
 import { CustomClassSerializerInterceptor } from './utils/customSerializeInterceptor';
 
 async function bootstrap() {
