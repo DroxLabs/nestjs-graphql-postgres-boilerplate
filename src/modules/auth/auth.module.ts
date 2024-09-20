@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { UserModule } from '../user/user.module';
-import { AuthService } from './services/auth.service';
 import {
   BcryptPasswordService,
   PasswordService,
 } from './services/password.service';
 import { JwtTokenService, TokenService } from './services/token.service';
 import { JwtStrategy } from './strategies/jwt-strategy.service';
+import { AuthResolver } from './auth.resolver';
 
 @Module({
   imports: [
@@ -20,10 +20,10 @@ import { JwtStrategy } from './strategies/jwt-strategy.service';
     UserModule,
   ],
   providers: [
-    AuthService,
     { provide: PasswordService, useClass: BcryptPasswordService },
     { provide: TokenService, useClass: JwtTokenService },
     JwtStrategy,
+    AuthResolver,
   ],
 })
 export class AuthModule {}

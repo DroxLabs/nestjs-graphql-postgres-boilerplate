@@ -1,24 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { hash } from 'bcryptjs'; // Import bcryptjs to hash the password
 import { User } from 'src/database';
-import { CreateUserInput } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
   constructor() {}
 
-  async createUser(input: CreateUserInput): Promise<User> {
-    const hashedPassword = await hash(input.password, 11);
-
-    const user = User.create({
-      ...input,
-      password: hashedPassword,
-      dateJoined: new Date(),
-    });
-
-    await user.save();
-
-    return user;
+  async createUser(input: Partial<User>): Promise<User> {
+    const user = User.create(input); // This converts the plain object to a User instance
+    return (await user.save()) as User; // Save the user instance to the database
   }
 
   findById(id: number) {

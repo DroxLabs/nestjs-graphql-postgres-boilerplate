@@ -1,14 +1,16 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, HideField, ObjectType } from '@nestjs/graphql';
 import {
   BaseEntity,
   Column,
   Entity,
   PrimaryColumn,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 
 @ObjectType()
 @Entity({ name: 'user' })
+@Unique(['email'])
 export class User extends BaseEntity {
   @Field(() => Number)
   @PrimaryGeneratedColumn() // Auto-incrementing ID column
@@ -22,7 +24,7 @@ export class User extends BaseEntity {
   @Column({ type: 'text' }) // Regular column for the name
   name: string;
 
-  @Field(() => String)
+  @HideField()
   @Column({ type: 'text' })
   password: string;
 
