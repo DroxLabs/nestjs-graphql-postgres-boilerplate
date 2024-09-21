@@ -10,6 +10,27 @@ export class UserService {
     return (await user.save()) as User; // Save the user instance to the database
   }
 
+  async updateUser(id: number, input: Partial<User>): Promise<boolean> {
+    await User.update({ id }, input);
+
+    return true;
+  }
+
+  async validateRefreshToken(id: number, token: string): Promise<boolean> {
+    const user = await User.findOne({ where: { id } });
+    return user && user.refreshToken === token;
+  }
+
+  async clearRefreshToken(userId: number): Promise<void> {
+    await User.update(userId, { refreshToken: null });
+  }
+
+  findByRefreshToken(refreshToken: string) {
+    return User.findOne({
+      where: { refreshToken },
+    });
+  }
+
   findById(id: number) {
     return User.findOne({
       where: { id },

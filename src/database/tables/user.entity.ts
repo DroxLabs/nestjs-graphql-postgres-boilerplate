@@ -31,4 +31,8 @@ export class User extends BaseEntity {
   @Field(() => Date)
   @Column({ type: 'date', default: () => 'CURRENT_DATE' }) // Date column with default value
   dateJoined: Date;
+
+  @HideField()
+  @Column({ nullable: true }) // Can be null when there's no refresh token
+  refreshToken: string | null;
 }

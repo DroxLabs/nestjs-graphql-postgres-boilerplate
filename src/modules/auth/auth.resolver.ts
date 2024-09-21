@@ -1,11 +1,20 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { User } from 'src/database';
 import { CreateUserInput, LoginUserInput } from '../user/dto/user-auth.dto';
-import { TokenUserResponse } from './dto/token-user-response.dto';
+import {
+  TokenResponse,
+  TokenUserResponse,
+} from './dto/token-user-response.dto';
 import { PasswordService } from './services/password.service';
 import { UserService } from '../user/user.service';
-import { TokenService } from './services/token.service';
-import { NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { TokenService, TokenType } from './services/token.service';
+import {
+  NotFoundException,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
+import { GqlAuthGuard } from './guards/gql-auth.guard';
+import { AuthUser } from './decorators/auth-user.decorator';
 
 @Resolver(User)
 export class AuthResolver {
@@ -34,12 +43,17 @@ export class AuthResolver {
       throw new UnauthorizedException('Incorrect password');
     }
 
-    const token = this.tokenService.generateToken({
-      email: user.email,
-      id: user.id,
-    });
+    const { accessToken, refreshToken } = this.generateTokens(user);
 
-    return { user, token };
+    await this.userService.updateUser(user.id, { refreshToken });
+
+    return {
+      user,
+      tokens: {
+        accessToken,
+        refreshToken,
+      },
+    };
   }
 
   @Mutation(() => TokenUserResponse)
@@ -55,11 +69,62 @@ export class AuthResolver {
       password: hashedPassword,
     });
 
-    const token = this.tokenService.generateToken({
+    const { accessToken, refreshToken } = this.generateTokens(user);
+
+    await this.userService.updateUser(user.id, { refreshToken });
+
+    return {
+      user,
+      tokens: {
+        accessToken,
+        refreshToken,
+      },
+    };
+  }
+
+  @Mutation(() => TokenResponse)
+  async refreshTokens(
+    @Args('userRefreshToken') userRefreshToken: string,
+  ): Promise<TokenResponse> {
+    const decoded = this.tokenService.validateToken(
+      userRefreshToken,
+      TokenType.REFRESH,
+    );
+    const user = await this.userService.findByRefreshToken(userRefreshToken);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const { accessToken, refreshToken } = this.generateTokens(user);
+    await this.userService.updateUser(decoded.userId, { refreshToken });
+
+    return { accessToken, refreshToken };
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(GqlAuthGuard)
+  async logout(@AuthUser() user: User): Promise<boolean> {
+    await this.userService.clearRefreshToken(user.id);
+
+    return true;
+  }
+
+  private generateTokens(user: User) {
+    const tokenPayload = {
       email: user.email,
       id: user.id,
-    });
+    };
 
-    return { user, token };
+    return {
+      accessToken: this.tokenService.generateToken(
+        tokenPayload,
+        TokenType.ACCESS,
+      ),
+      refreshToken: this.tokenService.generateToken(
+        tokenPayload,
+        TokenType.REFRESH,
+      ),
+    };
   }
 }
