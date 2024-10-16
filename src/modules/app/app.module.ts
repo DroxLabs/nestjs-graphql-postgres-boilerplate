@@ -1,10 +1,12 @@
 import { Module, OnModuleInit } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import * as redisStore from 'cache-manager-ioredis';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from '../user/user.module';
 import { Database } from '../../database';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
@@ -20,6 +22,14 @@ import { AuthModule } from '../auth/auth.module';
         'subscriptions-transport-ws': true,
       },
     }),
+    CacheModule.register({
+      store: redisStore,
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT, 10) || 6379,
+      ttl: 600, // Default time-to-live (TTL) for cached items (10 minutes)
+      max: 1000, // Maximum number of items in cache
+    }),
+
     UserModule,
     AuthModule,
   ],
