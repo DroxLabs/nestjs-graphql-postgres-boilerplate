@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import { Logger } from 'src/modules/Logger/GlobalLogger';
 
 @Catch()
 export class GlobalExceptionsFilter implements ExceptionFilter {
@@ -28,13 +29,16 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
           : 'Internal server error';
 
       // Log error details
-      console.error('Error encountered', {
-        type: host.getType(),
-        isGraphql: isGraphql,
-        status: status,
-        message: message,
-        path: isGraphql ? request.body.operationName : request.url,
-      });
+      Logger.error(
+        {
+          type: host.getType(),
+          isGraphql: isGraphql,
+          status: status,
+          message: message,
+          path: isGraphql ? request.body.operationName : request.url,
+        },
+        'Error encountered',
+      );
 
       if (isGraphql) {
         throw new Error(

@@ -10,7 +10,7 @@ import { Database } from '../../database';
 import { AuthModule } from '../auth/auth.module';
 import { LoggerModule } from '../Logger/logger.module';
 import { ILoggerService } from '../Logger/logger.type';
-import { GlobalLogger } from '../Logger/GlobalLogger';
+import { Logger } from '../Logger/GlobalLogger';
 
 @Module({
   imports: [
@@ -45,6 +45,6 @@ export class AppModule implements OnModuleInit {
 
   public async onModuleInit() {
     await Database.initialize();
-    GlobalLogger.initialize(this.loggerService);
+    Logger.initialize(this.loggerService);
   }
 }

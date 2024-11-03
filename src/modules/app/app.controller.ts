@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-import { GlobalLogger } from '../Logger/GlobalLogger';
+import { Logger } from '../Logger/GlobalLogger';
 
 @Controller()
 export class AppController {
@@ -9,16 +9,16 @@ export class AppController {
   @Get()
   getHello(): string {
     // ! global logger testing
-    GlobalLogger.log('Log', 'AppController');
-    GlobalLogger.debug(
+    Logger.log('Log', 'AppController');
+    Logger.debug(
       {
         name: 'developer',
         items: [1, 2, 3, 4],
       },
       'AppController',
     );
-    GlobalLogger.warn('Warn', 'AppController');
-    GlobalLogger.error(
+    Logger.warn('Warn', 'AppController');
+    Logger.error(
       {
         error: {
           status: 400,

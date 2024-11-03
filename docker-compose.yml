@@ -24,8 +24,8 @@ services:
   nestjs-app:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: nestjs_app
+      dockerfile: ${DOCKERFILE:-Dockerfile}
+    container_name: app
     environment:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: $POSTGRES_PORT
@@ -36,6 +36,7 @@ services:
       REFRESH_SECRET: $REFRESH_SECRET
       REDIS_HOST: redis
       REDIS_PORT: $REDIS_PORT
+      NODE_ENV: ${NODE_ENV:-production}
     volumes:
       - ./src:/app/src # Sync local src folder with container's src folder
       - ./node_modules:/app/node_modules # Avoid re-installing node_modules
@@ -43,7 +44,7 @@ services:
       - postgres
     ports:
       - '3999:3999'
-    command: npm run start:dev
+    # command: npm run start:dev
 
 volumes:
   pgdata: # Volume for PostgreSQL
