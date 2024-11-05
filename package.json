@@ -21,7 +21,8 @@
     "typeorm": "ts-node ./node_modules/.bin/typeorm",
     "migration:generate": "npm run typeorm -- migration:generate -d src/database/index.ts src/database/migrations/$npm_config_name",
     "migrate": "npm run typeorm -- migration:run -d src/database/index.ts",
-    "migration:revert": "npm run typeorm -- migration:revert -d src/database"
+    "migration:revert": "npm run typeorm -- migration:revert -d src/database",
+    "cache:clear": "npm run typeorm cache:clear -d src/database/index.ts"
   },
   "dependencies": {
     "@apollo/server": "^4.11.0",

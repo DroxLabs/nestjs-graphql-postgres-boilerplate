@@ -5,19 +5,17 @@ import {
   Entity,
   PrimaryColumn,
   PrimaryGeneratedColumn,
-  Unique,
 } from 'typeorm';
 
 @ObjectType()
 @Entity({ name: 'user' })
-@Unique(['email'])
 export class User extends BaseEntity {
   @Field(() => Number)
   @PrimaryGeneratedColumn() // Auto-incrementing ID column
   id: number;
 
   @Field(() => String)
-  @PrimaryColumn({ type: 'text' }) // Email as primary column
+  @PrimaryColumn({ name: 'email', unique: true, type: 'text' }) // Email as primary column
   email: string;
 
   @Field(() => String)
