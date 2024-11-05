@@ -11,6 +11,7 @@ import { AuthModule } from '../auth/auth.module';
 import { LoggerModule } from '../Logger/logger.module';
 import { ILoggerService } from '../Logger/logger.type';
 import { Logger } from '../Logger/GlobalLogger';
+import { ItemsModule } from '../items/items.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { Logger } from '../Logger/GlobalLogger';
     UserModule,
     AuthModule,
     LoggerModule,
+    ItemsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
