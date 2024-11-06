@@ -1,9 +1,9 @@
 import { ObjectType, Field } from '@nestjs/graphql';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
 
 @ObjectType() // GraphQL type decorator
 @Entity({ name: 'items' }) // TypeORM entity decorator
-export class Item {
+export class Item extends BaseEntity {
   @Field(() => Number) // GraphQL field for ID
   @PrimaryGeneratedColumn() // TypeORM auto-incrementing primary key
   id: number;
