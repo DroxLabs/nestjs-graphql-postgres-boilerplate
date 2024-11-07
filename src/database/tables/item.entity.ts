@@ -39,4 +39,8 @@ export class Item extends BaseEntity {
   // New tsvector column for full-text search
   @Column({ type: 'tsvector', select: false, nullable: true })
   searchVector: string;
+
+  @Field(() => Number)
+  @Column({ type: 'integer', nullable: true })
+  popularity: number;
 }

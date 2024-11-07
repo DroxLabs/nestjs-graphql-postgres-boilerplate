@@ -20,6 +20,7 @@ export class ItemsService {
           "ts_rank(item.searchVector, plainto_tsquery('english', :query))",
           'DESC',
         )
+        .addOrderBy('item.popularity', 'DESC')
         .limit(20)
         .getMany();
 
