@@ -26,11 +26,13 @@
   },
   "dependencies": {
     "@apollo/server": "^4.11.0",
+    "@elastic/elasticsearch": "^8.15.1",
     "@faker-js/faker": "^9.2.0",
     "@nestjs/apollo": "^12.2.0",
     "@nestjs/cache-manager": "^2.2.2",
     "@nestjs/common": "^10.0.0",
     "@nestjs/core": "^10.0.0",
+    "@nestjs/elasticsearch": "^10.0.2",
     "@nestjs/graphql": "^12.2.0",
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/mapped-types": "*",

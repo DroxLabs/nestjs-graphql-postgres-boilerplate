@@ -2,10 +2,53 @@ import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
 import { Database, Item } from 'src/database';
 import { Logger } from '../Logger/GlobalLogger';
+import { MoreThan } from 'typeorm';
+import { ElasticSearchService } from '../elastic-search/elastic-search.service';
 
 @Injectable()
 export class ItemsService {
+  constructor(private readonly elasticsearchService: ElasticSearchService) {}
+
   create() {}
+
+  async indexAllItems(): Promise<void> {
+    try {
+      let lastId = 0;
+      let itemsBatch: Item[];
+
+      do {
+        itemsBatch = await Item.find({
+          where: { id: MoreThan(lastId) },
+          take: 10000,
+          order: { id: 'ASC' },
+        });
+
+        if (itemsBatch.length > 0) {
+          const body = itemsBatch.flatMap((item) => [
+            { index: { _index: 'items', _id: item.id } },
+            {
+              title: item.title,
+              description: item.description,
+              tags: item.tags,
+              popularity: item.popularity,
+              price: item.price,
+              dateUploaded: item.dateUploaded,
+            },
+          ]);
+
+          const res = await this.elasticsearchService.bulkIndex(body);
+          Logger.debug(res.errors, 'Elasticsearch bulk index errors');
+          Logger.log(`Indexed ${itemsBatch.length} items to Elasticsearch.`);
+
+          lastId = itemsBatch[itemsBatch.length - 1].id;
+        }
+      } while (itemsBatch.length === 10000);
+
+      Logger.log('All items have been indexed.');
+    } catch (e) {
+      Logger.error('Error indexing all items:', e);
+    }
+  }
 
   async searchItems(query: string): Promise<Item[]> {
     try {
