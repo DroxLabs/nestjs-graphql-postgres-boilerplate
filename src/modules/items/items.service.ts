@@ -73,14 +73,14 @@ export class ItemsService {
         };
 
         values.push(
-          `('${item.title}', '${item.description}', ARRAY[${item.tags.map((val) => `'${val}'`)}], '${item.tagsString}', ${item.price}, '${item.dateUploaded}', '${item.lastUpdated}')`,
+          `('${item.title}', '${item.description}', ARRAY[${item.tags.map((val) => `'${val}'`)}], '${item.tagsString}', ${item.price}, '${item.dateUploaded}', '${item.lastUpdated}', '${Math.floor(Math.random() * 100)}')`,
         );
       }
 
       Logger.log(`Inserting ${values.length} items into the database...`);
 
       const query = `
-      INSERT INTO items (title, description, tags, "tagsString", price, "dateUploaded", "lastUpdated")
+      INSERT INTO items (title, description, tags, "tagsString", price, "dateUploaded", "lastUpdated", popularity)
       VALUES ${values.join(', ')}
     `;
 
