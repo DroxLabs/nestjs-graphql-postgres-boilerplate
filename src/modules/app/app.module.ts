@@ -12,6 +12,7 @@ import { LoggerModule } from '../Logger/logger.module';
 import { ILoggerService } from '../Logger/logger.type';
 import { Logger } from '../Logger/GlobalLogger';
 import { ItemsModule } from '../items/items.module';
+import { ElasticSearchModule } from '../elastic-search/elastic-search.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ItemsModule } from '../items/items.module';
       max: 1000, // Maximum number of items in cache
     }),
 
+    ElasticSearchModule,
     UserModule,
     AuthModule,
     LoggerModule,

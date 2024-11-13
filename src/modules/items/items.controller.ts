@@ -5,9 +5,14 @@ import { ItemsService } from './items.service';
 export class ItemsController {
   constructor(private readonly itemsService: ItemsService) {}
 
+  @Get('index')
+  index() {
+    return this.itemsService.indexAllItems();
+  }
+
   @Get('search')
   search(@Query('query') query: string) {
-    return this.itemsService.searchItems(query);
+    return this.itemsService.elasticSearchItems(query);
   }
 
   @Get()
