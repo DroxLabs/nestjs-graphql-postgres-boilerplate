@@ -22,6 +22,7 @@ services:
       - '5432:5432'
 
   nestjs-app:
+    image: devleed/nestjs-postgres:latest
     build:
       context: .
       dockerfile: ${DOCKERFILE:-Dockerfile}
