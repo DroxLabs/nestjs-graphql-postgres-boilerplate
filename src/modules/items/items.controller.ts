@@ -1,5 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ItemsService } from './items.service';
+import { Database } from 'src/database';
 
 @Controller('items')
 export class ItemsController {
@@ -13,5 +14,12 @@ export class ItemsController {
   @Get()
   create() {
     return this.itemsService.bulkInsertItems();
+  }
+
+  @Get('create/hypertable')
+  async enableHypertable() {
+    await Database.query(`
+      SELECT create_hypertable('items', 'dateUploaded');
+    `);
   }
 }

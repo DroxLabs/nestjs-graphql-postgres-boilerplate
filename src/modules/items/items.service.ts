@@ -30,7 +30,7 @@ export class ItemsService {
     }
   }
 
-  async bulkInsertItems(totalItems: number = 1000000): Promise<void> {
+  async bulkInsertItems(totalItems: number = 500000): Promise<void> {
     try {
       const availableLanguages = [
         'js',
@@ -70,17 +70,22 @@ export class ItemsService {
           price: faker.number.int({ min: 100, max: 10000 }),
           dateUploaded: date,
           lastUpdated: date,
+          picture: faker.image.urlLoremFlickr({
+            height: 600,
+            width: 600,
+            category: 'object',
+          }),
         };
 
         values.push(
-          `('${item.title}', '${item.description}', ARRAY[${item.tags.map((val) => `'${val}'`)}], '${item.tagsString}', ${item.price}, '${item.dateUploaded}', '${item.lastUpdated}', '${Math.floor(Math.random() * 100)}')`,
+          `('${item.title}', '${item.description}', ARRAY[${item.tags.map((val) => `'${val}'`)}], '${item.tagsString}', ${item.price}, '${item.dateUploaded}', '${item.lastUpdated}', '${Math.floor(Math.random() * 100)}', '${item.picture}')`,
         );
       }
 
       Logger.log(`Inserting ${values.length} items into the database...`);
 
       const query = `
-      INSERT INTO items (title, description, tags, "tagsString", price, "dateUploaded", "lastUpdated", popularity)
+      INSERT INTO items (title, description, tags, "tagsString", price, "dateUploaded", "lastUpdated", popularity, picture)
       VALUES ${values.join(', ')}
     `;
 

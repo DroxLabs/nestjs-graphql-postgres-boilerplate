@@ -1,5 +1,12 @@
 import { ObjectType, Field } from '@nestjs/graphql';
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
+import {
+  Entity,
+  Column,
+  BaseEntity,
+  PrimaryColumn,
+  Index,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @ObjectType() // GraphQL type decorator
 @Entity({ name: 'items' }) // TypeORM entity decorator
@@ -7,6 +14,10 @@ export class Item extends BaseEntity {
   @Field(() => Number) // GraphQL field for ID
   @PrimaryGeneratedColumn() // TypeORM auto-incrementing primary key
   id: number;
+
+  @Field(() => Date)
+  @PrimaryColumn({ type: 'date', default: () => 'CURRENT_DATE' }) // Date column with default value, primary column for timescaleDB
+  dateUploaded: Date; // GraphQL field for created date
 
   @Field() // GraphQL field for title
   @Column({ type: 'text' }) // TypeORM column for title
@@ -30,10 +41,6 @@ export class Item extends BaseEntity {
 
   @Field(() => Date)
   @Column({ type: 'date', default: () => 'CURRENT_DATE' }) // Date column with default value
-  dateUploaded: Date; // GraphQL field for created date
-
-  @Field(() => Date)
-  @Column({ type: 'date', default: () => 'CURRENT_DATE' }) // Date column with default value
   lastUpdated: Date;
 
   // New tsvector column for full-text search
@@ -43,4 +50,12 @@ export class Item extends BaseEntity {
   @Field(() => Number)
   @Column({ type: 'integer', nullable: true })
   popularity: number;
+
+  @Index() // Create a separate index for `id`
+  @Column({ type: 'integer', generatedType: 'STORED', asExpression: 'id' })
+  idIndex: number;
+
+  @Field(() => String)
+  @Column({ type: 'text', nullable: true })
+  picture: string;
 }
