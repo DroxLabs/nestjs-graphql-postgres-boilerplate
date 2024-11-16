@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
 import { Database, Item } from 'src/database';
 import { Logger } from '../Logger/GlobalLogger';
+import { ItemGraphBucketSizes, ItemGraphRanges } from './item.types';
 
 @Injectable()
 export class ItemsService {
@@ -30,6 +31,77 @@ export class ItemsService {
     }
   }
 
+  // Generic method to fetch data for a specific time range
+  private async fetchAggregatedData(
+    startDate: Date,
+    bucketSize: string,
+  ): Promise<any> {
+    try {
+      Logger.debug(startDate, 'Start Date');
+      Logger.debug(bucketSize, 'Bucket Size');
+
+      const res = await Database.query(
+        `
+      SELECT time_bucket($1, "dateUploaded") AS time_bucket,
+             COUNT(*) AS total_items,
+             SUM(price) AS total_price
+      FROM items
+      WHERE "dateUploaded" >= $2
+      GROUP BY time_bucket
+      ORDER BY time_bucket;
+      `,
+        [bucketSize, startDate],
+      );
+
+      return res;
+    } catch (error) {
+      Logger.error('Error fetching aggregated data:', error);
+    }
+  }
+
+  // Method for fetching data for predefined time ranges
+  async getDataForTimeRange(range: ItemGraphRanges): Promise<any> {
+    const now = new Date();
+    let startDate: Date;
+    let bucketSize: string;
+
+    switch (range) {
+      case ItemGraphRanges.ONE_DAY:
+        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000); // 1 day ago
+        bucketSize = ItemGraphBucketSizes.ONE_HOUR;
+        break;
+
+      case ItemGraphRanges.ONE_WEEK:
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 1 week ago
+        bucketSize = ItemGraphBucketSizes.ONE_DAY;
+        break;
+
+      case ItemGraphRanges.ONE_MONTH:
+        startDate = new Date(now);
+        startDate.setMonth(now.getMonth() - 1); // 1 month ago
+        bucketSize = ItemGraphBucketSizes.ONE_DAY;
+        break;
+
+      case ItemGraphRanges.THREE_MONTHS:
+        startDate = new Date(now);
+        startDate.setMonth(now.getMonth() - 3); // 3 months ago
+        bucketSize = ItemGraphBucketSizes.ONE_WEEK;
+        break;
+
+      case ItemGraphRanges.ONE_YEAR:
+        startDate = new Date(now);
+        startDate.setFullYear(now.getFullYear() - 1); // 1 year ago
+        bucketSize = ItemGraphBucketSizes.ONE_MONTH;
+        break;
+
+      default:
+        throw new Error('Invalid time range specified');
+    }
+
+    return this.fetchAggregatedData(startDate, bucketSize);
+  }
+
+  // ! INSERTION OF ITEMS INTO THE DATABASE
   async bulkInsertItems(totalItems: number = 500000): Promise<void> {
     try {
       const availableLanguages = [

@@ -1,6 +1,7 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Post, Query } from '@nestjs/common';
 import { ItemsService } from './items.service';
 import { Database } from 'src/database';
+import { ItemGraphRanges } from './item.types';
 
 @Controller('items')
 export class ItemsController {
@@ -11,7 +12,13 @@ export class ItemsController {
     return this.itemsService.searchItems(query);
   }
 
-  @Get()
+  @Get('range')
+  async getGraphDataForRange(@Query('range') range: ItemGraphRanges) {
+    return await this.itemsService.getDataForTimeRange(range);
+  }
+
+  // ! INSERTION OF DATA
+  @Post()
   create() {
     return this.itemsService.bulkInsertItems();
   }
@@ -19,7 +26,7 @@ export class ItemsController {
   @Get('create/hypertable')
   async enableHypertable() {
     await Database.query(`
-      SELECT create_hypertable('items', 'dateUploaded');
+      SELECT create_hypertable('items', 'dateUploaded', migrate_data => true);
     `);
   }
 }
